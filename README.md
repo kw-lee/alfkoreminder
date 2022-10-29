@@ -48,3 +48,8 @@ rk 오늘안에 퇴사하기
 
 * https://github.com/mollax/fanatstical_korean_alfred_workflow
 * https://www.alfredforum.com/topic/15992-applescript-reads-alfred-environment-variables-in-wrong-encoding/
+
+## 버전 정보
+
+v0.0.2: 버그 수정, `ㅇㅇ분 뒤 할 일`의 순서 수정
+v0.0.1: 워크플로우 작성

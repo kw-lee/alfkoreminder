@@ -24,6 +24,34 @@ SOFTWARE.
 import sys
 from workflow import Workflow3
 from dateparser import parser
+from subprocess import Popen, PIPE
+import os
+
+def addReminder():
+    subject = os.environ['subject'].replace('"', '\\"')
+    due_dt = os.environ['due_dt']
+    allday = os.environ['allday']
+    script = f'''
+set todo to "{subject}" as string
+set due_date to "{due_dt}" as string
+set allday to "{allday}" as string
+tell application "Reminders"
+    activate
+    if due_date is not equal to "" then
+    if allday is equal to "true" then
+        make new reminder at end with properties {{name:todo, allday due date:date due_date}}
+    else
+        make new reminder at end with properties {{name:todo, due date:date due_date}}
+    end if
+    else
+    make new reminder at end with properties {{name:todo}}
+    end if
+end tell
+    '''
+    args = []
+    p = Popen(['/usr/bin/osascript', '-'] + args,
+              stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = p.communicate(script.encode("utf-8"))
 
 def main(wf):
     args = wf.args[0]

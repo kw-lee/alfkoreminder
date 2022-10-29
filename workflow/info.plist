@@ -87,30 +87,13 @@
 				<key>escaping</key>
 				<integer>68</integer>
 				<key>script</key>
-				<string>on run argv
-  set subject to (system attribute "subject") as string
-  set due_date to (system attribute "due_dt") as string
-  set allday to (system attribute "allday") as string
-  set todo to do shell script "echo " &amp; quoted form of subject &amp; " | iconv -f UTF-8-MAC -t MACROMAN"
-  tell application "Reminders"
-    activate
-    if due_date is not equal to "" then
-      if allday is equal to "true" then
-        make new reminder at end with properties {name:todo, allday due date:date due_date}
-      else
-        make new reminder at end with properties {name:todo, due date:date due_date}
-      end if
-    else
-      make new reminder at end with properties {name:todo}
-    end if
-  end tell
-end run</string>
+				<string>/usr/bin/python3 -c 'from main import addReminder; addReminder()'</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
 				<string></string>
 				<key>type</key>
-				<integer>6</integer>
+				<integer>0</integer>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.action.script</string>
@@ -142,7 +125,7 @@ end run</string>
 	<key>userconfigurationconfig</key>
 	<array/>
 	<key>version</key>
-	<string>0.0.1</string>
+	<string>0.0.2</string>
 	<key>webaddress</key>
 	<string>https://kw-lee.github.com/alfkoreminder</string>
 </dict>

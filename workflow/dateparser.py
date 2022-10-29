@@ -303,8 +303,8 @@ def parser(q):
                         "due_dt": due_dt,
                         "allday": "false",
                         "wday": wday})
-                    if only_inc_given[-1]:
-                        results[-1], results[-2] = results[-2], results[-1]
+                    # if only_inc_given[-1]:
+                    #     results[-1], results[-2] = results[-2], results[-1]
                 elif time_given[-2]:
                     for minute in [59, now_dt[-1], 0]:
                         abs_dt[-1] = minute

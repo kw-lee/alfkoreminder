@@ -29,19 +29,30 @@ import os
 
 def addReminder():
     subject = os.environ['subject'].replace('"', '\\"')
-    due_dt = os.environ['due_dt']
+    due_year = os.environ['due_year']
+    due_month = os.environ['due_month']
+    due_day = os.environ['due_day']
+    due_hour = os.environ['due_hour']
+    due_minute = os.environ['due_minute']
+    str_due_dt = os.environ['str_due_dt']
     allday = os.environ['allday']
     script = f'''
 set todo to "{subject}" as string
-set due_date to "{due_dt}" as string
+set due_dt to (current date)
+set str_due_dt to "{str_due_dt}"
+set year of due_dt to "{due_year}"
+set month of due_dt to "{due_month}"
+set day of due_dt to "{due_day}"
+set hours of due_dt to "{due_hour}"
+set minutes of due_dt to "{due_minute}"
 set allday to "{allday}" as string
 tell application "Reminders"
     activate
-    if due_date is not equal to "" then
+    if str_due_dt is not equal to "" then
     if allday is equal to "true" then
-        make new reminder at end with properties {{name:todo, allday due date:date due_date}}
+        make new reminder at end with properties {{name:todo, allday due date:due_dt}}
     else
-        make new reminder at end with properties {{name:todo, due date:date due_date}}
+        make new reminder at end with properties {{name:todo, due date:due_dt}}
     end if
     else
     make new reminder at end with properties {{name:todo}}
@@ -52,6 +63,7 @@ end tell
     p = Popen(['/usr/bin/osascript', '-'] + args,
               stdin=PIPE, stdout=PIPE, stderr=PIPE)
     stdout, stderr = p.communicate(script.encode("utf-8"))
+    print(stdout + stderr)
 
 def main(wf):
     args = wf.args[0]
@@ -61,13 +73,19 @@ def main(wf):
 
     for item in results:
         subject = item["subject"]
-        due_dt = item["due_dt"]
+        str_due_dt = item["str_due_dt"]
         allday = item["allday"]
         wday = item["wday"]
+        item['due_year'] = str(item['due_dt'].year) if item['due_dt'] else ''
+        item['due_month'] = str(item['due_dt'].month) if item['due_dt'] else ''
+        item['due_day'] = str(item['due_dt'].day) if item['due_dt'] else ''
+        item['due_hour'] = str(item['due_dt'].hour) if item['due_dt'] else ''
+        item['due_minute'] = str(item['due_dt'].minute) if item['due_dt'] else ''
+        item['due_dt'] = None
         if allday == "true":
-            subtitle = f"{due_dt} ({wday}) 하루 종일"
+            subtitle = f"{str_due_dt} ({wday}) 하루 종일"
         elif allday == "false":
-            due_d, due_t = due_dt.split(" ", 1)
+            due_d, due_t = str_due_dt.split(" ", 1)
             subtitle = f"{due_d} ({wday}) {due_t}"
         else:
             subtitle = ""
@@ -88,4 +106,4 @@ def main(wf):
 if __name__ == '__main__':
     wf = Workflow3()
     sys.exit(wf.run(main))
-    # print(parser("다음주 목요일 오후 6시까지 청소하기"))
+    # print(parser("다음주 목요일까지 청소하기"))

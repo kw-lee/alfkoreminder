@@ -103,8 +103,8 @@ def convert_dt(year, month, day, hour, minute, only_date=False, weekday=None, dt
         dt_increment += relativedelta(days=weekday) - relativedelta(days=due_dt.weekday())
     due_dt += dt_increment
     wday = due_dt.weekday()
-    due_dt = due_dt.strftime('%m/%d/%Y') if only_date else due_dt.strftime('%m/%d/%Y %I:%M %p') 
-    return due_dt, wday
+    str_due_dt = due_dt.strftime('%m/%d/%Y') if only_date else due_dt.strftime('%m/%d/%Y %I:%M %p') 
+    return str_due_dt, wday, due_dt
 
 def parser(q):
 
@@ -141,7 +141,7 @@ def parser(q):
     except_week = False
 
     # default: No information
-    results = [{"subject": q, "due_dt": "", "allday": "", "wday": ""}]
+    results = [{"subject": q, "due_dt": "", "allday": "", "wday": "", "str_due_dt": ""}]
 
     # parsed_date, add_date => datetime
     if add_date or parsed_date:
@@ -291,16 +291,18 @@ def parser(q):
                     else:
                         break
                 if time_given[-1]:
-                    due_dt, wday = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment, only_date=True)
+                    str_due_dt, wday, due_dt = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment, only_date=True)
                     wday = weekday_list[wday]
                     results.append({"subject": parsed_subject,
                         "due_dt": due_dt,
+                        "str_due_dt": str_due_dt,
                         "allday": "true",
                         "wday": wday})
-                    due_dt, wday = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment)
+                    str_due_dt, wday, due_dt = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment)
                     wday = weekday_list[wday]
                     results.append({"subject": parsed_subject, 
                         "due_dt": due_dt,
+                        "str_due_dt": str_due_dt,
                         "allday": "false",
                         "wday": wday})
                     # if only_inc_given[-1]:
@@ -308,18 +310,20 @@ def parser(q):
                 elif time_given[-2]:
                     for minute in [59, now_dt[-1], 0]:
                         abs_dt[-1] = minute
-                        due_dt, wday = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment)
+                        str_due_dt, wday, due_dt = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment)
                         wday = weekday_list[wday]
                         results.append({"subject": parsed_subject,
                             "due_dt": due_dt,
+                            "str_due_dt": str_due_dt,
                             "allday": "false",
                             "wday": wday})
                     if only_inc_given[-2]:
                         results[-1], results[-2] = results[-2], results[-1]
-                    due_dt, wday = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment, only_date=True)
+                    str_due_dt, wday, due_dt = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment, only_date=True)
                     wday = weekday_list[wday]
                     results.insert(1, {"subject": parsed_subject,
                         "due_dt": due_dt,
+                        "str_due_dt": str_due_dt,
                         "allday": "true",
                         "wday": wday})
                 elif time_given[-3]:
@@ -335,26 +339,29 @@ def parser(q):
                             abs_dt[0] = abs_dt_i.year
                             abs_dt[1] = abs_dt_i.month
                             abs_dt[2] = abs_dt_i.day
-                            due_dt, wday = convert_dt(*abs_dt, weekday=weekday, only_date=True)
+                            str_due_dt, wday, due_dt = convert_dt(*abs_dt, weekday=weekday, only_date=True)
                             wday = weekday_list[wday]
                             results.append({"subject": parsed_subject,
                                 "due_dt": due_dt,
+                                "str_due_dt": str_due_dt,
                                 "allday": "true",
                                 "wday": wday})            
                     else:
                         for (hour, minute) in [(23, 59), (12, 0), (now_dt[-2], now_dt[-1])]:
                             abs_dt[-1] = minute
                             abs_dt[-2] = hour
-                            due_dt, wday = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment)
+                            str_due_dt, wday, due_dt = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment)
                             wday = weekday_list[wday]
                             results.append({"subject": parsed_subject,
                                 "due_dt": due_dt,
+                                "str_due_dt": str_due_dt,
                                 "allday": "false",
                                 "wday": wday})
-                        due_dt, wday = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment, only_date=True)
+                        str_due_dt, wday, due_dt = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment, only_date=True)
                         wday = weekday_list[wday]
                         results.append({"subject": parsed_subject,
                             "due_dt": due_dt,
+                            "str_due_dt": str_due_dt,
                             "allday": "true",
                             "wday": wday})
                 elif time_given[-4]:
@@ -365,12 +372,14 @@ def parser(q):
                         wday = weekday_list[wday]
                         results.append({"subject": parsed_subject,
                             "due_dt": due_dt,
+                            "str_due_dt": str_due_dt,
                             "allday": "true",
                             "wday": wday})
-                    due_dt, wday = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment)
+                    str_due_dt, wday, due_dt = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment)
                     wday = weekday_list[wday]
                     results.append({"subject": parsed_subject,
                         "due_dt": due_dt,
+                        "str_due_dt": str_due_dt,
                         "allday": "false",
                         "wday": wday})
                 elif time_given[-5]:
@@ -379,16 +388,18 @@ def parser(q):
                     for (month, day) in [(12, 31), (1, 1), (now_dt[1], now_dt[2])]:
                         abs_dt[1] = month
                         abs_dt[2] = day
-                        due_dt, wday = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment, only_date=True)
+                        str_due_dt, wday, due_dt = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment, only_date=True)
                         wday = weekday_list[wday]
                         results.append({"subject": parsed_subject,
                             "due_dt": due_dt,
+                            "str_due_dt": str_due_dt,
                             "allday": "true",
                             "wday": wday})
-                    due_dt, wday = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment)
+                    str_due_dt, wday, due_dt = convert_dt(*abs_dt, weekday=weekday, dt_increment=dt_increment)
                     wday = weekday_list[wday]
                     results.append({"subject": parsed_subject,
                         "due_dt": due_dt,
+                        "str_due_dt": str_due_dt,
                         "allday": "false",
                         "wday": wday})
 
